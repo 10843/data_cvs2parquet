@@ -15,34 +15,37 @@ import parquet.Log;
  * @author Eric Theis <eric_theis@gensler.com>
  */
 public class App {
-  private static final Log LOG = Log.getLog(App.class);
-  
-  private static final int fileSizeMegs = 1000;
+    private static final Log LOG = Log.getLog(App.class);
+
+    private static final String testPath = "/Users/10843/Develop/MarketingFiles/";
+    private static final String testFile = "indexer_file_test";
 
     public static void main( String[] args ) throws Exception
     {
-        File csvTestFile = Utils.createTestFile(fileSizeMegs);
+        File csvTestFile = new File(testPath, testFile + ".csv");
 
-         File parquetTestFile = Utils.getParquetOutputFile("perf", String.valueOf(fileSizeMegs), true);
-         long startTime = System.currentTimeMillis();
-         ConvertUtils.convertCsvToParquet(csvTestFile, parquetTestFile);
-         long endTime = System.currentTimeMillis();
+        File parquetTestFile = getParquetOutputFile(true);
 
-         long totalTime = (endTime - startTime);
-         LOG.info("Write Time: " + totalTime ); 
+        long startTime = System.currentTimeMillis();
 
-         Utils.writePerfResult("write", totalTime);
+        ConvertUtils.convertCsvToParquet(csvTestFile, parquetTestFile);
 
-         LOG.info("Time taken to write " + fileSizeMegs + " sized csv file : " + fileSizeMegs);
+        long endTime = System.currentTimeMillis();
 
-         assertTrue(totalTime < 60000);
-    
-        // It should not be slower than previous versions
-        for(String version : Utils.getAllPreviousVersionDirs()) {
-          long totalTimeForVersion = Utils.readPerfResult(version, "write");
-          LOG.info("Time taken to write with version "+ version + ": " + totalTimeForVersion);
-          assertTrue(totalTime < 1.1 * totalTimeForVersion);
-        }
- 
+        long totalTime = (endTime - startTime);
+        LOG.info("Write Time: " + totalTime ); 
+
     }
+
+
+    public static File getParquetOutputFile(boolean deleteIfExists) {
+        File outputFile = new File(testPath, testFile + ".parquet");
+        outputFile.getParentFile().mkdirs();
+        if(deleteIfExists) {
+            outputFile.delete();
+        }
+
+        return outputFile;
+    }
+    
 }

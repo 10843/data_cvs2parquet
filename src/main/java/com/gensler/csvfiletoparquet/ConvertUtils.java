@@ -96,6 +96,11 @@ public class ConvertUtils {
     int lineNumber = 0;
     try {
       while ((line = br.readLine()) != null) {
+          //needed if the line ends with a comma
+        if (line.endsWith(",")) {
+            line += "|";
+        }
+                
         String[] fields = line.split(Pattern.quote(CSV_DELIMITER));
         writer.write(Arrays.asList(fields));
         ++lineNumber;
